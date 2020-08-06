@@ -37,9 +37,56 @@ test('githubFetch', async () => {
   expect(mockFetch).toHaveBeenCalledWith(query, {},
     {
       headers: {
-        Authorization: 'Bearer my-token'
+        Authorization: `Bearer ${token}`
       },
       method: 'POST'
     }
   )
+})
+
+test('githubFetchContributorsForPage', async () => {
+  // repoOwner, repoName, branch, pagePath, token
+  const repoOwner = 'my-org'
+  const repoName = 'my-name'
+  const branch = 'my-branch'
+  const pagePath = 'page-path'
+  const token = 'my-token'
+  const aDate = new Date()
+
+  mockFetch.mockResolvedValueOnce({
+    data: {
+      repository: {
+        object: {
+          history: {
+            nodes: [
+              {
+                author: {
+                  date: aDate.toISOString(),
+                  user: {
+                    name: 'John Doe',
+                    login: 'johndoe2020'
+                  }
+                }
+              },
+              {
+                author: {
+                  date: aDate.toISOString(),
+                  user: {
+                    name: 'Jane Austen',
+                    login: 'janeausten2020'
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+
+  })
+  await expect(githubFetchContributorsForPage(repoOwner, repoName, branch, pagePath, token))
+    .resolves.toEqual([
+      { date: aDate.toISOString(), login: 'johndoe2020', name: 'John Doe' },
+      { date: aDate.toISOString(), login: 'janeausten2020', name: 'Jane Austen' }
+    ])
 })
