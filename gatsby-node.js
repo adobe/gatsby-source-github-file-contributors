@@ -14,9 +14,9 @@ const globby = require('globby')
 const { githubFetchContributorsForPage } = require('./src/gql')
 const path = require('path')
 
-exports.sourceNodes = async ({ actions, createNodeId, createContentDigest }, options) => {
-  const { paths: pages = ['src/pages'], extensions = ['md'] } = options.pages
-  const { token, owner, name, branch } = options.repo
+exports.sourceNodes = async ({ actions, createNodeId, createContentDigest }, options = {}) => {
+  const { paths: pages = ['src/pages'], extensions = ['md'] } = options.pages ? options.pages : {}
+  const { token, owner, name, branch } = options.repo ? options.repo : {}
 
   if (!token) {
     throw new Error('token is required (GITHUB_TOKEN environment variable)')

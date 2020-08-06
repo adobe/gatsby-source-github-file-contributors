@@ -11,7 +11,7 @@
  */
 
 const GITHUB_GQL_ENDPOINT = 'https://api.github.com/graphql'
-const fetch = require('graphql-fetch')(GITHUB_GQL_ENDPOINT)
+const gqlFetch = require('graphql-fetch')(GITHUB_GQL_ENDPOINT)
 
 /* global Headers */
 
@@ -26,7 +26,7 @@ async function githubFetch (query, token) {
     Authorization: `Bearer ${token}`
   })
 
-  return fetch(query, {}, {
+  return gqlFetch(query, {}, {
     headers,
     method: 'POST'
   })

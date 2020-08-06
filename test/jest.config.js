@@ -13,7 +13,9 @@ module.exports = {
   rootDir: '..',
   collectCoverage: true,
   collectCoverageFrom: [
-    '<rootDir>/src/**/*.js'
+    '<rootDir>/src/**/*.js',
+    '<rootDir>/index.js',
+    '<rootDir>/gatsby-node.js'
   ],
   coverageThreshold: {
     global: {
