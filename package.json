@@ -1,0 +1,35 @@
+{
+  "name": "@adobe/gatsby-source-github-file-contributors",
+  "version": "0.0.1",
+  "homepage": "https://github.com/adobe/gatsby-source-github-file-contributors",
+  "license": "Apache-2.0",
+  "repository": "https://github.com/adobe/gatsby-source-github-file-contributors",
+  "bugs": {
+    "url": "https://github.com/adobe/gatsby-source-github-file-contributors/issues"
+  },
+  "dependencies": {
+    "globby": "^11.0.1",
+    "graphql-fetch": "^1.0.1"
+  },
+  "scripts": {
+    "e2e": "jest --config e2e/jest.config.js",
+    "lint": "eslint . src test",
+    "test": "npm run lint && npm run unit-tests",
+    "unit-tests": "jest --config test/jest.config.js --maxWorkers=2"
+  },
+  "engines": {
+    "node": ">=10.0.0"
+  },
+  "devDependencies": {
+    "@adobe/eslint-config-aio-lib-config": "^1.2.0",
+    "eslint": "^6.0.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-jest": "^23.20.0",
+    "eslint-plugin-jsdoc": "^21.0.0",
+    "eslint-plugin-node": "^10.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "stdout-stderr": "^0.1.13"
+  }
+}
