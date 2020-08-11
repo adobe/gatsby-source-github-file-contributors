@@ -15,14 +15,14 @@ const { githubFetchContributorsForPage } = require('./src/gql')
 const path = require('path')
 
 exports.sourceNodes = async ({ actions, createNodeId, createContentDigest }, options = {}) => {
-  const root = options.root ? options.root : '';
+  const root = options.root ? options.root : ''
   const { paths: pages = ['src/pages'], extensions = ['md', 'mdx'] } = options.pages ? options.pages : {}
   const { token, owner, name, branch } = options.repo ? options.repo : {}
 
   if (!token) {
     throw new Error('token is required (GITHUB_TOKEN environment variable)')
   }
-  
+
   const paths = await globby(pages.map(page => path.resolve(process.cwd(), page)), {
     expandDirectories: {
       extensions
@@ -30,7 +30,7 @@ exports.sourceNodes = async ({ actions, createNodeId, createContentDigest }, opt
   })
 
   for (const _path of paths) {
-    const githubPath = path.join(root, _path.replace(process.cwd(), ''));
+    const githubPath = path.join(root, _path.replace(process.cwd(), ''))
     const contributors = await githubFetchContributorsForPage(owner, name, branch, githubPath, token)
     actions.createNode({
       contributors,
