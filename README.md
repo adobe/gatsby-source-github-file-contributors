@@ -55,13 +55,19 @@ GraphQL
 {
   allGithubContributors {
     nodes {
+      repository
+      branch
+      root
+    }
+  }    
+  allGithubContributors {
+    nodes {
       contributors {
         date
         login
         name
       }
-      path,
-      href
+      path
     }
   }        
 }
