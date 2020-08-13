@@ -67,21 +67,20 @@ test('sourceNodes', async () => {
     .mockResolvedValueOnce(contributors[1])
 
   await expect(gatsbyNode.sourceNodes(gatsbyHelpers, options)).resolves.toEqual(undefined)
-  expect(gatsbyHelpers.actions.createNode).toHaveBeenCalledTimes(pages.length)
+  expect(gatsbyHelpers.actions.createNode).toHaveBeenCalledTimes(pages.length + 1)
   expect(mockGithubFetchContributors).toHaveBeenCalledTimes(pages.length)
 
   options.root = 'my-root' // coverage
   mockGlobby.mockResolvedValueOnce([])
   await expect(gatsbyNode.sourceNodes(gatsbyHelpers, options)).resolves.toEqual(undefined)
-  expect(gatsbyHelpers.actions.createNode).toHaveBeenCalledTimes(pages.length)
+  expect(gatsbyHelpers.actions.createNode).toHaveBeenCalledTimes(pages.length + 2)
   expect(mockGithubFetchContributors).toHaveBeenCalledTimes(pages.length)
 
   pages.forEach((page, index) => {
     const { owner, name, branch, token } = options.repo
     expect(mockGithubFetchContributors).toHaveBeenNthCalledWith(index + 1, owner, name, branch, page, token)
-    expect(gatsbyHelpers.actions.createNode).toHaveBeenNthCalledWith(index + 1, expect.objectContaining({
+    expect(gatsbyHelpers.actions.createNode).toHaveBeenNthCalledWith(index + 2, expect.objectContaining({
       contributors: contributors[index],
-      href: `https://github.com/${owner}/${name}`,
       internal: expect.objectContaining({
         type: 'GithubContributors'
       })

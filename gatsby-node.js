@@ -29,13 +29,25 @@ exports.sourceNodes = async ({ actions, createNodeId, createContentDigest }, opt
     }
   })
 
+  const repository = `${owner}/${name}`
+
+  actions.createNode({
+    repository,
+    branch,
+    root,
+    id: createNodeId(repository),
+    internal: {
+      type: 'Github',
+      contentDigest: createContentDigest(repository)
+    }
+  })
+
   for (const _path of paths) {
     const githubPath = path.join(root, _path.replace(process.cwd(), ''))
     const contributors = await githubFetchContributorsForPage(owner, name, branch, githubPath, token)
     actions.createNode({
       contributors,
       path: _path,
-      href: `https://github.com/${owner}/${name}`,
       id: createNodeId(_path),
       internal: {
         type: 'GithubContributors',
