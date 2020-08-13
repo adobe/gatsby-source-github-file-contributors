@@ -35,13 +35,14 @@ plugins: [
     resolve: `@adobe/gatsby-source-github-file-contributors`,
       options: {
         pages: {
-          paths: ['src/pages'],
-          extensions: ['md']
+          root: '', // root of the page paths (below) in the Github repo
+          paths: ['src/pages'], // relative path of the pages from the config
+          extensions: ['md'] // page extensions to filter for
         },
         repo: {
-          token: process.env.GITHUB_TOKEN,
-          owner: process.env.GITHUB_REPO_OWNER,
-          name: process.env.GITHUB_REPO_NAME,
+          token: process.env.GITHUB_TOKEN, // Github Personal Access Token
+          owner: process.env.GITHUB_REPO_OWNER, // user or org name
+          name: process.env.GITHUB_REPO_NAME, 
           branch: process.env.GITHUB_REPO_BRANCH
         }
       }

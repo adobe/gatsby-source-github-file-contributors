@@ -70,6 +70,12 @@ test('sourceNodes', async () => {
   expect(gatsbyHelpers.actions.createNode).toHaveBeenCalledTimes(pages.length)
   expect(mockGithubFetchContributors).toHaveBeenCalledTimes(pages.length)
 
+  options.root = 'my-root' // coverage
+  mockGlobby.mockResolvedValueOnce([])
+  await expect(gatsbyNode.sourceNodes(gatsbyHelpers, options)).resolves.toEqual(undefined)
+  expect(gatsbyHelpers.actions.createNode).toHaveBeenCalledTimes(pages.length)
+  expect(mockGithubFetchContributors).toHaveBeenCalledTimes(pages.length)
+
   pages.forEach((page, index) => {
     const { owner, name, branch, token } = options.repo
     expect(mockGithubFetchContributors).toHaveBeenNthCalledWith(index + 1, owner, name, branch, page, token)
