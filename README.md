@@ -53,6 +53,13 @@ plugins: [
 GraphQL
 ```
 {
+  allGithub {
+    nodes {
+      repository
+      branch
+      root
+    }
+  }    
   allGithubContributors {
     nodes {
       contributors {
@@ -60,8 +67,7 @@ GraphQL
         login
         name
       }
-      path,
-      href
+      path
     }
   }        
 }
