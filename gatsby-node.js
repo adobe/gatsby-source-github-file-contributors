@@ -43,8 +43,11 @@ exports.sourceNodes = async ({ actions, createNodeId, createContentDigest }, opt
   })
 
   for (const _path of paths) {
-    const githubPath = path.join(root, _path.replace(process.cwd(), ''))
+    let githubPath = path.join(root, _path.replace(process.cwd(), ''))
+    if (githubPath.charAt(0) === '/') githubPath = githubPath.substr(1)
+
     const contributors = await githubFetchContributorsForPage(owner, name, branch, githubPath, token)
+
     actions.createNode({
       contributors,
       path: _path,
