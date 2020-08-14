@@ -53,7 +53,7 @@ plugins: [
 GraphQL
 ```
 {
-  allGithubContributors {
+  allGithub {
     nodes {
       repository
       branch
