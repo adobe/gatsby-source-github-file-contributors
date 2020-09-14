@@ -59,7 +59,7 @@ exports.sourceNodes = async ({ actions, createNodeId, createContentDigest }, opt
 
   for (const _path of paths) {
     let githubPath = path.join(root, _path.replace(process.cwd(), ''))
-    if (githubPath.charAt(0) === '/') githubPath = githubPath.substr(1)
+    if (githubPath.charAt(0) === path.sep) githubPath = githubPath.substr(1)
 
     let contributors = []
     if (token) {

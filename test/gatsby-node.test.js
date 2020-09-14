@@ -10,6 +10,7 @@
  * governing permissions and limitations under the License.
  */
 
+const path = require('path')
 const mockGithubFetchContributors = jest.fn()
 const mockGithubFetch = jest.fn()
 jest.mock('../src/gql', () => ({
@@ -108,14 +109,16 @@ describe('gatsby-node', () => {
       .mockResolvedValueOnce(contributors[1])
 
     const root = 'my-root'
-    options.root = `/${root}` // coverage
-    await expect(gatsbyNode.sourceNodes(gatsbyHelpers, options)).resolves.toEqual(undefined)
+    const _options = Object.assign({}, options)
+    _options.root = `/${root}` // coverage
+    await expect(gatsbyNode.sourceNodes(gatsbyHelpers, _options)).resolves.toEqual(undefined)
     expect(gatsbyHelpers.actions.createNode).toHaveBeenCalledTimes(pages.length + 1)
     expect(mockGithubFetchContributors).toHaveBeenCalledTimes(pages.length)
 
     pages.forEach((page, index) => {
-      const { owner, name, branch, token } = options.repo
-      expect(mockGithubFetchContributors).toHaveBeenNthCalledWith(index + 1, owner, name, branch, `${root}/${page}`, token)
+      const { owner, name, branch, token } = _options.repo
+      const pagePath = path.join(root, page)
+      expect(mockGithubFetchContributors).toHaveBeenNthCalledWith(index + 1, owner, name, branch, pagePath, token)
       // skip the very first createNode, which is a Github object
       expect(gatsbyHelpers.actions.createNode).toHaveBeenNthCalledWith(index + 2, expect.objectContaining({
         contributors: contributors[index],
