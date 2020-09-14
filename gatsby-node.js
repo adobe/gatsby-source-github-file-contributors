@@ -14,13 +14,28 @@ const globby = require('globby')
 const { githubFetchContributorsForPage } = require('./src/gql')
 const path = require('path')
 
+exports.createSchemaCustomization = ({ actions }) => {
+  const { createTypes } = actions
+  const typeDefs = `
+    type Contributors implements Node {
+      date: String,
+      login: String,
+      name: String
+    }
+    type GithubContributors implements Node {
+      contributors: [Contributors]
+    }
+  `
+  createTypes(typeDefs)
+}
+
 exports.sourceNodes = async ({ actions, createNodeId, createContentDigest }, options = {}) => {
   const root = options.root ? options.root : ''
   const { paths: pages = ['src/pages'], extensions = ['md', 'mdx'] } = options.pages ? options.pages : {}
-  const { token, owner, name, branch } = options.repo ? options.repo : {}
+  const { token, owner, name, branch = 'main' } = options.repo ? options.repo : {}
 
   if (!token) {
-    throw new Error('token is required (GITHUB_TOKEN environment variable)')
+    console.warn('To get Github Contributors, a Github token is required (GITHUB_TOKEN environment variable)')
   }
 
   const paths = await globby(pages.map(page => path.resolve(process.cwd(), page)), {
@@ -46,7 +61,10 @@ exports.sourceNodes = async ({ actions, createNodeId, createContentDigest }, opt
     let githubPath = path.join(root, _path.replace(process.cwd(), ''))
     if (githubPath.charAt(0) === '/') githubPath = githubPath.substr(1)
 
-    const contributors = await githubFetchContributorsForPage(owner, name, branch, githubPath, token)
+    let contributors = []
+    if (token) {
+      contributors = await githubFetchContributorsForPage(owner, name, branch, githubPath, token)
+    }
 
     actions.createNode({
       contributors,

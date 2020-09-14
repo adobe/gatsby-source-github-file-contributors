@@ -17,6 +17,9 @@ jest.mock('../src/gql', () => ({
   githubFetch: mockGithubFetch
 }))
 
+const originalWarn = console.warn
+const mockedWarn = jest.fn()
+
 const mockGlobby = jest.fn()
 jest.mock('globby', () => mockGlobby)
 
@@ -24,25 +27,16 @@ const gatsbyNode = require('../gatsby-node')
 
 const gatsbyHelpers = {
   actions: {
-    createNode: jest.fn()
+    createNode: jest.fn(),
+    createTypes: jest.fn()
   },
   createNodeId: jest.fn(),
   createContentDigest: jest.fn()
 }
 
-beforeEach(() => {
-  jest.restoreAllMocks()
-})
+// ///////////////////////////////////////
 
-test('exists', () => {
-  expect(typeof gatsbyNode.sourceNodes).toEqual('function')
-})
-
-test('sourceNodes, no token', async () => {
-  await expect(gatsbyNode.sourceNodes(gatsbyHelpers)).rejects.toThrowError('token is required (GITHUB_TOKEN environment variable)')
-})
-
-test('sourceNodes', async () => {
+describe('gatsby-node', () => {
   const options = {
     pages: {
     },
@@ -53,37 +47,82 @@ test('sourceNodes', async () => {
       token: 'dummy-token'
     }
   }
-
   const pages = ['foo.md', 'bar.md']
-  mockGlobby.mockResolvedValueOnce(pages)
-
   const contributors = [
     [{ name: 'John Doe', login: 'johndoe2020', date: new Date() }],
     [{ name: 'Jane Austen', login: 'janeausten2020', date: new Date() }]
   ]
 
-  mockGithubFetchContributors
-    .mockResolvedValueOnce(contributors[0])
-    .mockResolvedValueOnce(contributors[1])
+  beforeEach(() => {
+    jest.resetAllMocks()
+    console.warn = mockedWarn
+  })
 
-  await expect(gatsbyNode.sourceNodes(gatsbyHelpers, options)).resolves.toEqual(undefined)
-  expect(gatsbyHelpers.actions.createNode).toHaveBeenCalledTimes(pages.length + 1)
-  expect(mockGithubFetchContributors).toHaveBeenCalledTimes(pages.length)
+  afterEach(() => {
+    console.warn = originalWarn
+  })
 
-  options.root = 'my-root' // coverage
-  mockGlobby.mockResolvedValueOnce([])
-  await expect(gatsbyNode.sourceNodes(gatsbyHelpers, options)).resolves.toEqual(undefined)
-  expect(gatsbyHelpers.actions.createNode).toHaveBeenCalledTimes(pages.length + 2)
-  expect(mockGithubFetchContributors).toHaveBeenCalledTimes(pages.length)
+  test('exists', () => {
+    expect(typeof gatsbyNode.sourceNodes).toEqual('function')
+  })
 
-  pages.forEach((page, index) => {
-    const { owner, name, branch, token } = options.repo
-    expect(mockGithubFetchContributors).toHaveBeenNthCalledWith(index + 1, owner, name, branch, page, token)
-    expect(gatsbyHelpers.actions.createNode).toHaveBeenNthCalledWith(index + 2, expect.objectContaining({
-      contributors: contributors[index],
-      internal: expect.objectContaining({
-        type: 'GithubContributors'
-      })
-    }))
+  test('no token', async () => {
+    mockGlobby.mockResolvedValueOnce(pages)
+
+    await expect(gatsbyNode.sourceNodes(gatsbyHelpers)).resolves.toEqual(undefined)
+    await expect(mockedWarn).toHaveBeenCalledWith('To get Github Contributors, a Github token is required (GITHUB_TOKEN environment variable)')
+  })
+
+  test('createSchemaCustomization', () => {
+    expect(gatsbyNode.createSchemaCustomization(gatsbyHelpers)).toEqual(undefined)
+    expect(gatsbyHelpers.actions.createTypes).toHaveBeenCalledTimes(1)
+  })
+
+  test('no root', async () => {
+    mockGlobby.mockResolvedValue(pages)
+    mockGithubFetchContributors
+      .mockResolvedValueOnce(contributors[0])
+      .mockResolvedValueOnce(contributors[1])
+
+    await expect(gatsbyNode.sourceNodes(gatsbyHelpers, options)).resolves.toEqual(undefined)
+    expect(gatsbyHelpers.actions.createNode).toHaveBeenCalledTimes(pages.length + 1)
+    expect(mockGithubFetchContributors).toHaveBeenCalledTimes(pages.length)
+
+    pages.forEach((page, index) => {
+      const { owner, name, branch, token } = options.repo
+      expect(mockGithubFetchContributors).toHaveBeenNthCalledWith(index + 1, owner, name, branch, page, token)
+      // skip the very first createNode, which is a Github object
+      expect(gatsbyHelpers.actions.createNode).toHaveBeenNthCalledWith(index + 2, expect.objectContaining({
+        contributors: contributors[index],
+        internal: expect.objectContaining({
+          type: 'GithubContributors'
+        })
+      }))
+    })
+  })
+
+  test('with root', async () => {
+    mockGlobby.mockResolvedValue(pages)
+    mockGithubFetchContributors
+      .mockResolvedValueOnce(contributors[0])
+      .mockResolvedValueOnce(contributors[1])
+
+    const root = 'my-root'
+    options.root = `/${root}` // coverage
+    await expect(gatsbyNode.sourceNodes(gatsbyHelpers, options)).resolves.toEqual(undefined)
+    expect(gatsbyHelpers.actions.createNode).toHaveBeenCalledTimes(pages.length + 1)
+    expect(mockGithubFetchContributors).toHaveBeenCalledTimes(pages.length)
+
+    pages.forEach((page, index) => {
+      const { owner, name, branch, token } = options.repo
+      expect(mockGithubFetchContributors).toHaveBeenNthCalledWith(index + 1, owner, name, branch, `${root}/${page}`, token)
+      // skip the very first createNode, which is a Github object
+      expect(gatsbyHelpers.actions.createNode).toHaveBeenNthCalledWith(index + 2, expect.objectContaining({
+        contributors: contributors[index],
+        internal: expect.objectContaining({
+          type: 'GithubContributors'
+        })
+      }))
+    })
   })
 })
