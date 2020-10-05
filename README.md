@@ -13,7 +13,7 @@ governing permissions and limitations under the License.
 [![Version](https://img.shields.io/npm/v/@adobe/gatsby-source-github-file-contributors.svg)](https://npmjs.org/package/@adobe/gatsby-source-github-file-contributors)
 [![Downloads/week](https://img.shields.io/npm/dw/@adobe/gatsby-source-github-file-contributors.svg)](https://npmjs.org/package/@adobe/gatsby-source-github-file-contributors)
 [![Build Status](https://travis-ci.com/adobe/gatsby-source-github-file-contributors.svg?branch=master)](https://travis-ci.com/adobe/gatsby-source-github-file-contributors)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Codecov Coverage](https://img.shields.io/codecov/c/github/adobe/gatsby-source-github-file-contributors/master.svg?style=flat-square)](https://codecov.io/gh/adobe/gatsby-source-github-file-contributors/)
 
 # @adobe/gatsby-source-github-file-contributors
@@ -33,24 +33,27 @@ npm install --save @adobe/gatsby-source-github-file-contributors
 plugins: [
   {
     resolve: `@adobe/gatsby-source-github-file-contributors`,
-      options: {
-        pages: {
-          root: '', // root of the page paths (below) in the Github repo
-          paths: ['src/pages'], // relative path of the pages from the config
-          extensions: ['md'] // page extensions to filter for
-        },
-        repo: {
-          token: process.env.GITHUB_TOKEN, // Github Personal Access Token
-          owner: process.env.GITHUB_REPO_OWNER, // user or org name
-          name: process.env.GITHUB_REPO_NAME, 
-          branch: process.env.GITHUB_REPO_BRANCH
-        }
+    options: {
+      pages: {
+        root: '', // root of the page paths (below) in the Github repo
+        paths: ['src/pages'], // relative path of the pages from the config
+        extensions: ['md'], // page extensions to filter for
+        prefix: '' // prefix to remove from path, Optional
+      },
+      repo: {
+        token: process.env.GITHUB_TOKEN, // Github Personal Access Token
+        owner: process.env.GITHUB_REPO_OWNER, // user or org name
+        name: process.env.GITHUB_REPO_NAME,
+        branch: process.env.GITHUB_REPO_BRANCH,
+        api: 'https://api.github.com/graphql' // API url, Optional. Default: 'https://api.github.com/graphql'
       }
+    }
   }
-];
+]
 ```
 
 GraphQL
+
 ```
 {
   allGithub {
@@ -59,23 +62,24 @@ GraphQL
       branch
       root
     }
-  }    
+  }
   allGithubContributors {
     nodes {
       contributors {
         date
         login
         name
+        avatarUrl
       }
       path
     }
-  }        
+  }
 }
 ```
 
 ### Github Personal Access Token
 
-Without a [Github Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token), your requests will be rate-limited.  
+Without a [Github Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token), your requests will be rate-limited.
 The GraphQL API v4 rate limit is 5,000 points per hour when authenticated, and 60 points per hour when anonymous.
 
 ### Contributing
@@ -85,4 +89,3 @@ Contributions are welcome! Read the [Contributing Guide](./.github/CONTRIBUTING.
 ### Licensing
 
 This project is licensed under the Apache V2 License. See [LICENSE](LICENSE) for more information.
-
