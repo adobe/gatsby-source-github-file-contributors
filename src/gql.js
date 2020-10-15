@@ -66,17 +66,22 @@ async function githubFetchContributorsForPage (repoOwner, repoName, branch, page
 
   // the nodes history is from latest history to earliest
   const { nodes } = res.data.repository.object.history
-  // flatten the nodes
-  const flattenedNodes = nodes.map(node => {
-    const { date, user } = node.author
-    const { name, login } = user
+  const flattenedNodes = nodes
+    // remove nodes where the user is null
+    .filter(node => {
+      return node.author && node.author.user && node.author.user.name && node.author.user.login
+    })
+    // flatten the nodes
+    .map(node => {
+      const { date, user } = node.author
+      const { name, login } = user
 
-    return {
-      name,
-      login,
-      date
-    }
-  })
+      return {
+        name,
+        login,
+        date
+      }
+    })
 
   // create a Set (thus unique items), by mapping via login
   return Array.from(new Set(flattenedNodes.map(node => node.login)))
