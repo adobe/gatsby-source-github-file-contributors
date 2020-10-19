@@ -16,6 +16,13 @@ const gqlFetch = require('graphql-fetch')(GITHUB_GQL_ENDPOINT)
 /* global Headers */
 
 /**
+ * @typedef {object} GithubContributorInfo
+ * @property {string} name Github user name
+ * @property {string} login Github user login
+ * @property {string} date date of the contribution (ISO string)
+ */
+
+/**
  * GraphQL fetch function.
  *
  * @param {string} query the GraphQL query
@@ -40,6 +47,7 @@ async function githubFetch (query, token) {
  * @param {string} branch the Github branch to query from
  * @param {string} pagePath the folder path for the pages in the repo to query from
  * @param {string} token the Github Personal Access Token
+ * @returns {Array<GithubContributorInfo>} an array of the Github Contributor data
  */
 async function githubFetchContributorsForPage (repoOwner, repoName, branch, pagePath, token) {
   const res = await githubFetch(`
@@ -63,6 +71,20 @@ async function githubFetchContributorsForPage (repoOwner, repoName, branch, page
     }
   }
   `, token)
+
+  // if data is not as expected (usually from a Github API error) just return an empty array
+  if (!(
+    res &&
+    res.data &&
+    res.data.repository &&
+    res.data.repository.object &&
+    res.data.repository.object.history &&
+    res.data.repository.object.history.nodes &&
+    Array.isArray(res.data.repository.object.history.nodes)
+  )) {
+    console.warn(`The Github API didn't return the expected data, returning an empty contributor array. res: ${JSON.stringify(res, null, 2)}`)
+    return []
+  }
 
   // the nodes history is from latest history to earliest
   const { nodes } = res.data.repository.object.history
