@@ -32,7 +32,7 @@ exports.createSchemaCustomization = ({ actions }) => {
 exports.sourceNodes = async ({ actions, createNodeId, createContentDigest }, options = {}) => {
   const root = options.root ? options.root : ''
   const { paths: pages = ['src/pages'], extensions = ['md', 'mdx'] } = options.pages ? options.pages : {}
-  const { token, owner, name, branch = 'main' } = options.repo ? options.repo : {}
+  const { token, owner, name, branch = 'main', default_branch = 'main' } = options.repo ? options.repo : {}
 
   if (!token) {
     console.warn('To get Github Contributors, a Github token is required (GITHUB_TOKEN environment variable)')
@@ -49,6 +49,7 @@ exports.sourceNodes = async ({ actions, createNodeId, createContentDigest }, opt
   actions.createNode({
     repository,
     branch,
+    default_branch,
     root,
     id: createNodeId(repository),
     internal: {
