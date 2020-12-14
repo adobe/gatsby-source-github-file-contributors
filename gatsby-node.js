@@ -34,7 +34,7 @@ exports.sourceNodes = async (
   { actions, createNodeId, createContentDigest },
   options = {}
 ) => {
-  const root = options.root ? options.root : ''
+  const root = options.pages.root ? options.pages.root : ''
   const {
     paths: pages = ['src/pages'],
     extensions = ['md', 'mdx'],
@@ -77,7 +77,7 @@ exports.sourceNodes = async (
   })
 
   for (const _path of paths) {
-    let githubPath = path.join(root, _path.replace(process.cwd(), ''))
+    let githubPath = _path.replace(root, '')
     if (githubPath.charAt(0) === path.sep) githubPath = githubPath.substr(1)
     if (prefix && githubPath.startsWith(prefix)) {
       githubPath = githubPath.slice(prefix.length + 1)
