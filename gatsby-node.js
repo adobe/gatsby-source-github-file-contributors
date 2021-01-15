@@ -30,6 +30,7 @@ exports.createSchemaCustomization = ({ actions }) => {
 }
 
 exports.sourceNodes = async ({ actions, createNodeId, createContentDigest }, options = {}) => {
+  const cwd = process.cwd()
   const root = options.root ? options.root : ''
   const { paths: pages = ['src/pages'], extensions = ['md', 'mdx'] } = options.pages ? options.pages : {}
   const { token, owner, name, branch = 'main', default_branch = 'main' } = options.repo ? options.repo : {}
@@ -38,7 +39,9 @@ exports.sourceNodes = async ({ actions, createNodeId, createContentDigest }, opt
     console.warn('To get Github Contributors, a Github token is required (GITHUB_TOKEN environment variable)')
   }
 
-  const paths = await globby(pages.map(page => path.resolve(process.cwd(), page)), {
+  // Support Windows
+  const regExp = /\\/g
+  const paths = await globby(pages.map(page => path.resolve(cwd, page).replace(regExp, '//')), {
     expandDirectories: {
       extensions
     }
@@ -59,7 +62,7 @@ exports.sourceNodes = async ({ actions, createNodeId, createContentDigest }, opt
   })
 
   for (const _path of paths) {
-    let githubPath = path.join(root, _path.replace(process.cwd(), ''))
+    let githubPath = path.join(root, _path.replace(cwd, ''))
     if (githubPath.charAt(0) === path.sep) githubPath = githubPath.substr(1)
 
     let contributors = []
