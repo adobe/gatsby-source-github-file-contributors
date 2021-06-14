@@ -85,14 +85,18 @@ exports.sourceNodes = async (
 
     let contributors = []
     if (token) {
-      contributors = await githubFetchContributorsForPage(
-        api,
-        owner,
-        name,
-        branch,
-        githubPath,
-        token
-      )
+      try {
+        contributors = await githubFetchContributorsForPage(
+          api,
+          owner,
+          name,
+          branch,
+          githubPath,
+          token
+        )
+      } catch (error) {
+        console.log(error)
+      }
     }
 
     actions.createNode({
