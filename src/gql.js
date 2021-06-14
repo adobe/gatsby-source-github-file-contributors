@@ -21,7 +21,7 @@ let gqlFetch = null
  * @param {string} query the GraphQL query
  * @param {string} token the Github Personal Access Token (repo scope only is needed)
  */
-async function githubFetch (api, query, token) {
+async function githubFetch(api, query, token) {
   if (!gqlFetch) {
     gqlFetch = require('graphql-fetch')(api)
   }
@@ -50,7 +50,7 @@ async function githubFetch (api, query, token) {
  * @param {string} pagePath the folder path for the pages in the repo to query from
  * @param {string} token the Github Personal Access Token
  */
-async function githubFetchContributorsForPage (
+async function githubFetchContributorsForPage(
   api,
   repoOwner,
   repoName,
@@ -84,6 +84,28 @@ async function githubFetchContributorsForPage (
   `,
     token
   )
+
+  // if data is not as expected (usually from a Github API error) just return an empty array
+  if (
+    !(
+      res &&
+      res.data &&
+      res.data.repository &&
+      res.data.repository.object &&
+      res.data.repository.object.history &&
+      res.data.repository.object.history.nodes &&
+      Array.isArray(res.data.repository.object.history.nodes)
+    )
+  ) {
+    console.warn(
+      `The Github API didn't return the expected data, returning an empty contributor array. res: ${JSON.stringify(
+        res,
+        null,
+        2
+      )}`
+    )
+    return []
+  }
 
   // the nodes history is from latest history to earliest
   const { nodes } = res.data.repository.object.history
