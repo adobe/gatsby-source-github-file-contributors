@@ -97,7 +97,7 @@ async function githubFetchContributorsForPage(
       Array.isArray(res.data.repository.object.history.nodes)
     )
   ) {
-    console.warn(
+    console.log(
       `The Github API didn't return the expected data, returning an empty contributor array. res: ${JSON.stringify(
         res,
         null,
