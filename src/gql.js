@@ -15,6 +15,13 @@ let gqlFetch = null
 /* global Headers */
 
 /**
+ * @typedef {object} GithubContributorInfo
+ * @property {string} name Github user name
+ * @property {string} login Github user login
+ * @property {string} date date of the contribution (ISO string)
+ */
+
+/**
  * GraphQL fetch function.
  *
  * @param {string} api the url of the GraphQL api
@@ -49,6 +56,7 @@ async function githubFetch(api, query, token) {
  * @param {string} branch the Github branch to query from
  * @param {string} pagePath the folder path for the pages in the repo to query from
  * @param {string} token the Github Personal Access Token
+ * @returns {Array<GithubContributorInfo>} an array of the Github Contributor data
  */
 async function githubFetchContributorsForPage(
   api,
@@ -107,23 +115,39 @@ async function githubFetchContributorsForPage(
     return []
   }
 
+  // if data is not as expected (usually from a Github API error) just return an empty array
+  if (!(
+    res &&
+    res.data &&
+    res.data.repository &&
+    res.data.repository.object &&
+    res.data.repository.object.history &&
+    res.data.repository.object.history.nodes &&
+    Array.isArray(res.data.repository.object.history.nodes)
+  )) {
+    console.warn(`The Github API didn't return the expected data, returning an empty contributor array. res: ${JSON.stringify(res, null, 2)}`)
+    return []
+  }
+
   // the nodes history is from latest history to earliest
   const { nodes } = res.data.repository.object.history
-  // flatten the nodes
-  const flattenedNodes = nodes.map((node) => {
-    let { date, user, avatarUrl } = node.author
-    if (user === null) {
-      user = {}
-    }
-    const { name = '', login = '' } = user
+  const flattenedNodes = nodes
+    // remove nodes where the user is null
+    .filter(node => {
+      return node.author && node.author.user && node.author.user.name && node.author.user.login
+    })
+    // flatten the nodes
+    .map(node => {
+      const { date, user, avatarUrl } = node.author
+      const { name, login } = user
 
-    return {
-      name,
-      login,
-      date,
-      avatarUrl
-    }
-  })
+      return {
+        name,
+        login,
+        date,
+        avatarUrl
+      }
+    })
 
   // create a Set (thus unique items), by mapping via login
   return (

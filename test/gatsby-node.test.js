@@ -128,4 +128,25 @@ describe('gatsby-node', () => {
       }))
     })
   })
+
+  test('replace windows path separators for globby', async () => {
+    mockGlobby.mockImplementation((pages) => {
+      pages.forEach((page) => {
+        expect(page.indexOf('\\')).toEqual(-1) // should not find Windows path separator
+      })
+      return pages
+    })
+
+    const resolveSpy = jest.spyOn(path, 'resolve')
+    resolveSpy.mockImplementation((...args) => {
+      return path.win32.resolve(...args) // force Windows path resolver
+    })
+    const _options = Object.assign({}, options)
+    _options.pages = {
+      paths: ['path\\1.md', 'path\\2.md', 'path/3.md']
+    }
+
+    await expect(gatsbyNode.sourceNodes(gatsbyHelpers, _options)).resolves.toEqual(undefined)
+    resolveSpy.mockRestore()
+  })
 })

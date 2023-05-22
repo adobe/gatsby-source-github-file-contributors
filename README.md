@@ -33,19 +33,21 @@ npm install --save @adobe/gatsby-source-github-file-contributors
 plugins: [
   {
     resolve: `@adobe/gatsby-source-github-file-contributors`,
-    options: {
-      pages: {
-        root: '', // root of the page paths (below) in the Github repo
-        paths: ['src/pages'], // relative path of the pages from the config
-        extensions: ['md'], // page extensions to filter for
-        prefix: '' // prefix to remove from path, Optional
-      },
-      repo: {
-        token: process.env.GITHUB_TOKEN, // Github Personal Access Token
-        owner: process.env.GITHUB_REPO_OWNER, // user or org name
-        name: process.env.GITHUB_REPO_NAME,
-        branch: process.env.GITHUB_REPO_BRANCH,
-        api: 'https://api.github.com/graphql' // API url, Optional. Default: 'https://api.github.com/graphql'
+      options: {
+        pages: {
+          root: '', // root of the page paths (below) in the Github repo
+          paths: ['src/pages'], // relative path of the pages from the config
+          extensions: ['md'], // page extensions to filter for
+          prefix: '' // prefix to remove from path, Optional
+        },
+        repo: {
+          token: process.env.REPO_GITHUB_TOKEN, // Github Personal Access Token
+          owner: process.env.REPO_OWNER, // user or org name
+          name: process.env.REPO_NAME, 
+          branch: process.env.REPO_BRANCH, // defaults to 'main'
+          default_branch: process.env.REPO_DEFAULT_BRANCH, // defaults to 'main'
+          api: 'https://api.github.com/graphql' // API url, Optional. Default: 'https://api.github.com/graphql'
+        }
       }
     }
   }
@@ -60,6 +62,7 @@ GraphQL
     nodes {
       repository
       branch
+      default_branch
       root
     }
   }
@@ -80,7 +83,10 @@ GraphQL
 ### Github Personal Access Token
 
 Without a [Github Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token), your requests will be rate-limited.
+
 The GraphQL API v4 rate limit is 5,000 points per hour when authenticated, and 60 points per hour when anonymous.
+
+The number of points in a GraphQL API call is returned in the metadata for the call.
 
 ### Contributing
 

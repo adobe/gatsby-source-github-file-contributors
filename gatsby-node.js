@@ -30,11 +30,9 @@ exports.createSchemaCustomization = ({ actions }) => {
   createTypes(typeDefs)
 }
 
-exports.sourceNodes = async (
-  { actions, createNodeId, createContentDigest },
-  options = {}
-) => {
-  const root = options.pages.root ? options.pages.root : ''
+exports.sourceNodes = async ({ actions, createNodeId, createContentDigest }, options = {}) => {
+  const cwd = process.cwd()
+  const root = options.pages.root ? options.pages.root : options.root ? options.root : ''
   const {
     paths: pages = ['src/pages'],
     extensions = ['md', 'mdx'],
@@ -45,6 +43,7 @@ exports.sourceNodes = async (
     owner,
     name,
     branch = 'main',
+    default_branch = 'main',
     api = 'https://api.github.com/graphql'
   } = options.repo ? options.repo : {}
 
@@ -54,12 +53,11 @@ exports.sourceNodes = async (
     )
   }
 
-  const paths = await globby(
-    pages.map((page) => path.resolve(process.cwd(), page)),
-    {
-      expandDirectories: {
-        extensions
-      }
+  // Support Windows
+  const regExp = /\\/g
+  const paths = await globby(pages.map(page => path.resolve(cwd, page).replace(regExp, '//')), {
+    expandDirectories: {
+      extensions
     }
   )
 
@@ -68,6 +66,7 @@ exports.sourceNodes = async (
   actions.createNode({
     repository,
     branch,
+    default_branch,
     root,
     id: createNodeId(repository),
     internal: {
@@ -77,7 +76,7 @@ exports.sourceNodes = async (
   })
 
   for (const _path of paths) {
-    let githubPath = _path.replace(root, '')
+    let githubPath = path.join(root, _path.replace(cwd, ''))
     if (githubPath.charAt(0) === path.sep) githubPath = githubPath.substr(1)
     if (prefix && githubPath.startsWith(prefix)) {
       githubPath = githubPath.slice(prefix.length + 1)
@@ -95,7 +94,7 @@ exports.sourceNodes = async (
           token
         )
       } catch (error) {
-        console.log(error)
+        console.error(error)
       }
     }
 

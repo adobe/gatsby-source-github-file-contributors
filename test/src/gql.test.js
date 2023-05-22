@@ -90,3 +90,17 @@ test('githubFetchContributorsForPage', async () => {
       { date: aDate.toISOString(), login: 'janeausten2020', name: 'Jane Austen' }
     ])
 })
+
+test('githubFetchContributorsForPage (Github API failure)', async () => {
+  // repoOwner, repoName, branch, pagePath, token
+  const repoOwner = 'my-org'
+  const repoName = 'my-name'
+  const branch = 'my-branch'
+  const pagePath = 'page-path'
+  const token = 'my-token'
+
+  mockFetch.mockResolvedValueOnce({})
+
+  await expect(githubFetchContributorsForPage(repoOwner, repoName, branch, pagePath, token))
+    .resolves.toEqual([])
+})
