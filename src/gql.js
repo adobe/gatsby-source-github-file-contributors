@@ -89,31 +89,7 @@ async function githubFetchContributorsForPage(
       }
     }
   }
-  `,
-    token
-  )
-
-  // if data is not as expected (usually from a Github API error) just return an empty array
-  if (
-    !(
-      res &&
-      res.data &&
-      res.data.repository &&
-      res.data.repository.object &&
-      res.data.repository.object.history &&
-      res.data.repository.object.history.nodes &&
-      Array.isArray(res.data.repository.object.history.nodes)
-    )
-  ) {
-    console.log(
-      `The Github API didn't return the expected data, returning an empty contributor array. res: ${JSON.stringify(
-        res,
-        null,
-        2
-      )}`
-    )
-    return []
-  }
+  `, token)
 
   // if data is not as expected (usually from a Github API error) just return an empty array
   if (!(
@@ -150,11 +126,9 @@ async function githubFetchContributorsForPage(
     })
 
   // create a Set (thus unique items), by mapping via login
-  return (
-    Array.from(new Set(flattenedNodes.map((node) => node.login)))
-      // map it back to the node (the first found will be the latest entry)
-      .map((login) => flattenedNodes.find((node) => node.login === login))
-  )
+  return Array.from(new Set(flattenedNodes.map(node => node.login)))
+    // map it back to the node (the first found will be the latest entry)
+    .map(login => flattenedNodes.find(node => node.login === login))
 }
 
 module.exports = {

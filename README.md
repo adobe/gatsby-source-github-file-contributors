@@ -13,7 +13,7 @@ governing permissions and limitations under the License.
 [![Version](https://img.shields.io/npm/v/@adobe/gatsby-source-github-file-contributors.svg)](https://npmjs.org/package/@adobe/gatsby-source-github-file-contributors)
 [![Downloads/week](https://img.shields.io/npm/dw/@adobe/gatsby-source-github-file-contributors.svg)](https://npmjs.org/package/@adobe/gatsby-source-github-file-contributors)
 [![Build Status](https://travis-ci.com/adobe/gatsby-source-github-file-contributors.svg?branch=master)](https://travis-ci.com/adobe/gatsby-source-github-file-contributors)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) 
 [![Codecov Coverage](https://img.shields.io/codecov/c/github/adobe/gatsby-source-github-file-contributors/master.svg?style=flat-square)](https://codecov.io/gh/adobe/gatsby-source-github-file-contributors/)
 
 # @adobe/gatsby-source-github-file-contributors
@@ -49,13 +49,11 @@ plugins: [
           api: 'https://api.github.com/graphql' // API url, Optional. Default: 'https://api.github.com/graphql'
         }
       }
-    }
   }
-]
+];
 ```
 
 GraphQL
-
 ```
 {
   allGithub {
@@ -65,7 +63,7 @@ GraphQL
       default_branch
       root
     }
-  }
+  }    
   allGithubContributors {
     nodes {
       contributors {
@@ -76,7 +74,7 @@ GraphQL
       }
       path
     }
-  }
+  }        
 }
 ```
 

@@ -48,9 +48,7 @@ exports.sourceNodes = async ({ actions, createNodeId, createContentDigest }, opt
   } = options.repo ? options.repo : {}
 
   if (!token) {
-    console.warn(
-      'To get Github Contributors, a Github token is required (GITHUB_TOKEN environment variable)'
-    )
+    console.warn('To get Github Contributors, a Github token is required (GITHUB_TOKEN environment variable)')
   }
 
   // Support Windows
@@ -59,7 +57,7 @@ exports.sourceNodes = async ({ actions, createNodeId, createContentDigest }, opt
     expandDirectories: {
       extensions
     }
-  )
+  })
 
   const repository = `${owner}/${name}`
 
