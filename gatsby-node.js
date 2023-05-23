@@ -98,7 +98,7 @@ exports.sourceNodes = async ({ actions, createNodeId, createContentDigest }, opt
     let contributors = []
     if (token) {
       contributors = await githubFetchContributorsForPage(
-        'https://git.corp.adobe.com/api/graphql',
+        api,
         owner,
         name,
         branch,
