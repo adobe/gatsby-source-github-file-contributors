@@ -46,7 +46,7 @@ plugins: [
           name: process.env.REPO_NAME, 
           branch: process.env.REPO_BRANCH, // defaults to 'main'
           default_branch: process.env.REPO_DEFAULT_BRANCH, // defaults to 'main'
-          api: process.env.GH_GQL_API_ENDPOINT || 'https://api.github.com/graphql' // API url, Optional. Default: 'https://api.github.com/graphql'
+          api: 'https://api.github.com/graphql' // API url, Optional. Default: 'https://api.github.com/graphql'
         }
       }
   }
