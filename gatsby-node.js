@@ -35,8 +35,7 @@ exports.sourceNodes = async ({ actions, createNodeId, createContentDigest }, opt
   const root = options.pages.root ? options.pages.root : options.root ? options.root : ''
   const {
     paths: pages = ['src/pages'],
-    extensions = ['md', 'mdx'],
-    prefix = ''
+    extensions = ['md', 'mdx']
   } = options.pages ? options.pages : {}
   const {
     token,
