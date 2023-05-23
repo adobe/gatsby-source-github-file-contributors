@@ -28,7 +28,7 @@ let gqlFetch = null
  * @param {string} query the GraphQL query
  * @param {string} token the Github Personal Access Token (repo scope only is needed)
  */
-async function githubFetch(api, query, token) {
+async function githubFetch (api, query, token) {
   if (!gqlFetch) {
     gqlFetch = require('graphql-fetch')(api)
   }
@@ -58,7 +58,7 @@ async function githubFetch(api, query, token) {
  * @param {string} token the Github Personal Access Token
  * @returns {Array<GithubContributorInfo>} an array of the Github Contributor data
  */
-async function githubFetchContributorsForPage(
+async function githubFetchContributorsForPage (
   api,
   repoOwner,
   repoName,
