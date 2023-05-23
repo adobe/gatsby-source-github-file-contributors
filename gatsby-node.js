@@ -74,10 +74,16 @@ exports.sourceNodes = async ({ actions, createNodeId, createContentDigest }, opt
   })
 
   for (const _path of paths) {
+    console.log('cwd:', cwd)
+    console.log('root:', root)
+    console.log('_path:', _path)
     let githubPath = path.join(root, _path.replace(cwd, ''))
+    console.log('githubPath:', githubPath)
     if (githubPath.charAt(0) === path.sep) githubPath = githubPath.substr(1)
+    console.log('githubPath.substr(1):', githubPath)
     if (prefix && githubPath.startsWith(prefix)) {
       githubPath = githubPath.slice(prefix.length + 1)
+      console.log('githubPath.slice(prefix.length + 1):', githubPath)
     }
 
     let contributors = []
