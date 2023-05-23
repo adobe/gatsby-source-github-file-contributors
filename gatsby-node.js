@@ -32,7 +32,15 @@ exports.createSchemaCustomization = ({ actions }) => {
 
 exports.sourceNodes = async ({ actions, createNodeId, createContentDigest }, options = {}) => {
   const cwd = process.cwd()
-  const root = options.pages.root ? options.pages.root : options.root ? options.root : ''
+  const root = options.pages
+    ? options.pages.root
+      ? options.pages.root
+      : options.root
+        ? options.root
+        : ''
+    : options.root
+      ? options.root
+      : ''
   const {
     paths: pages = ['src/pages'],
     extensions = ['md', 'mdx'],
@@ -74,32 +82,24 @@ exports.sourceNodes = async ({ actions, createNodeId, createContentDigest }, opt
   })
 
   for (const _path of paths) {
-    console.log('cwd:', cwd)
-    console.log('root:', root)
-    console.log('_path:', _path)
     let githubPath = path.join(root, _path.replace(cwd, ''))
-    console.log('githubPath:', githubPath)
-    if (githubPath.charAt(0) === path.sep) githubPath = githubPath.substr(1)
-    console.log('githubPath.substr(1):', githubPath)
+
     if (prefix && githubPath.startsWith(prefix)) {
-      githubPath = githubPath.slice(prefix.length + 1)
-      console.log('githubPath.slice(prefix.length + 1):', githubPath)
+      githubPath = githubPath.replaceAll(prefix, '')
     }
+
+    if (githubPath.charAt(0) === path.sep) githubPath = githubPath.substr(1)
 
     let contributors = []
     if (token) {
-      try {
-        contributors = await githubFetchContributorsForPage(
-          api,
-          owner,
-          name,
-          branch,
-          githubPath,
-          token
-        )
-      } catch (error) {
-        console.error(error)
-      }
+      contributors = await githubFetchContributorsForPage(
+        api,
+        owner,
+        name,
+        branch,
+        githubPath,
+        token
+      )
     }
 
     actions.createNode({
