@@ -38,6 +38,7 @@ plugins: [
           root: '', // root of the page paths (below) in the Github repo
           paths: ['src/pages'], // relative path of the pages from the config
           extensions: ['md'], // page extensions to filter for
+          prefix: '' // prefix to remove from path, Optional
         },
         repo: {
           token: process.env.REPO_GITHUB_TOKEN, // Github Personal Access Token
