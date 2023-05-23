@@ -73,10 +73,10 @@ exports.sourceNodes = async ({ actions, createNodeId, createContentDigest }, opt
   })
 
   for (const _path of paths) {
-    let githubPath = _path.replace(root, '')
-
-    if (githubPath.startsWith(path.sep)) {
-      githubPath = githubPath.slice(1)
+    let githubPath = path.join(root, _path.replace(cwd, ''))
+    if (githubPath.charAt(0) === path.sep) githubPath = githubPath.substr(1)
+    if (prefix && githubPath.startsWith(prefix)) {
+      githubPath = githubPath.slice(prefix.length + 1)
     }
 
     let contributors = []
