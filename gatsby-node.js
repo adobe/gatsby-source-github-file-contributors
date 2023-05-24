@@ -90,11 +90,6 @@ exports.sourceNodes = async ({ actions, createNodeId, createContentDigest }, opt
 
     if (githubPath.charAt(0) === path.sep) githubPath = githubPath.substr(1)
 
-    console.log('cwd:', cwd)
-    console.log('prefix:', prefix)
-    console.log('root:', root)
-    console.log('githubPath:', githubPath)
-
     let contributors = []
     if (token) {
       contributors = await githubFetchContributorsForPage(
