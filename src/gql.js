@@ -37,14 +37,10 @@ async function githubFetch (api, query, token) {
     Authorization: `Bearer ${token}`
   })
 
-  return gqlFetch(
-    query,
-    {},
-    {
-      headers,
-      method: 'POST'
-    }
-  )
+  return gqlFetch(query, {}, {
+    headers,
+    method: 'POST'
+  })
 }
 
 /**
