@@ -10,8 +10,7 @@
  * governing permissions and limitations under the License.
  */
 
-const GITHUB_GQL_ENDPOINT = 'https://api.github.com/graphql'
-const gqlFetch = require('graphql-fetch')(GITHUB_GQL_ENDPOINT)
+let gqlFetch = null
 
 /* global Headers */
 
@@ -25,10 +24,15 @@ const gqlFetch = require('graphql-fetch')(GITHUB_GQL_ENDPOINT)
 /**
  * GraphQL fetch function.
  *
+ * @param {string} api the url of the GraphQL api
  * @param {string} query the GraphQL query
  * @param {string} token the Github Personal Access Token (repo scope only is needed)
  */
-async function githubFetch (query, token) {
+async function githubFetch (api, query, token) {
+  if (!gqlFetch) {
+    gqlFetch = require('graphql-fetch')(api)
+  }
+
   const headers = new Headers({
     Authorization: `Bearer ${token}`
   })
@@ -42,6 +46,7 @@ async function githubFetch (query, token) {
 /**
  * Fetch the Github contributors for pages at a path in a repo.
  *
+ * @param {string} api the url of the GraphQL api
  * @param {string} repoOwner the Github org/owner to query from
  * @param {string} repoName the Github repo to query from
  * @param {string} branch the Github branch to query from
@@ -49,8 +54,17 @@ async function githubFetch (query, token) {
  * @param {string} token the Github Personal Access Token
  * @returns {Array<GithubContributorInfo>} an array of the Github Contributor data
  */
-async function githubFetchContributorsForPage (repoOwner, repoName, branch, pagePath, token) {
-  const res = await githubFetch(`
+async function githubFetchContributorsForPage (
+  api,
+  repoOwner,
+  repoName,
+  branch,
+  pagePath,
+  token
+) {
+  const res = await githubFetch(
+    api,
+    `
   query {
     repository(owner: "${repoOwner}", name: "${repoName}") {
       object(expression: "${branch}") {
@@ -58,6 +72,7 @@ async function githubFetchContributorsForPage (repoOwner, repoName, branch, page
           history(first: 100, path: "${pagePath}") {
             nodes {
               author {
+                avatarUrl
                 user {
                   name
                   login
@@ -95,13 +110,14 @@ async function githubFetchContributorsForPage (repoOwner, repoName, branch, page
     })
     // flatten the nodes
     .map(node => {
-      const { date, user } = node.author
+      const { date, user, avatarUrl } = node.author
       const { name, login } = user
 
       return {
         name,
         login,
-        date
+        date,
+        avatarUrl
       }
     })
 

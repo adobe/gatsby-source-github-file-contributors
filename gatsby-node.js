@@ -20,7 +20,8 @@ exports.createSchemaCustomization = ({ actions }) => {
     type Contributors implements Node {
       date: String,
       login: String,
-      name: String
+      name: String,
+      avatarUrl: String
     }
     type GithubContributors implements Node {
       contributors: [Contributors]
@@ -31,9 +32,28 @@ exports.createSchemaCustomization = ({ actions }) => {
 
 exports.sourceNodes = async ({ actions, createNodeId, createContentDigest }, options = {}) => {
   const cwd = process.cwd()
-  const root = options.root ? options.root : ''
-  const { paths: pages = ['src/pages'], extensions = ['md', 'mdx'] } = options.pages ? options.pages : {}
-  const { token, owner, name, branch = 'main', default_branch = 'main' } = options.repo ? options.repo : {}
+  const root = options.pages
+    ? options.pages.root
+      ? options.pages.root
+      : options.root
+        ? options.root
+        : ''
+    : options.root
+      ? options.root
+      : ''
+  const {
+    paths: pages = ['src/pages'],
+    extensions = ['md', 'mdx'],
+    prefix = ''
+  } = options.pages ? options.pages : {}
+  const {
+    token,
+    owner,
+    name,
+    branch = 'main',
+    default_branch = 'main',
+    api = 'https://api.github.com/graphql'
+  } = options.repo ? options.repo : {}
 
   if (!token) {
     console.warn('To get Github Contributors, a Github token is required (GITHUB_TOKEN environment variable)')
@@ -63,11 +83,23 @@ exports.sourceNodes = async ({ actions, createNodeId, createContentDigest }, opt
 
   for (const _path of paths) {
     let githubPath = path.join(root, _path.replace(cwd, ''))
+
+    if (prefix && githubPath.startsWith(prefix)) {
+      githubPath = githubPath.replaceAll(prefix, '')
+    }
+
     if (githubPath.charAt(0) === path.sep) githubPath = githubPath.substr(1)
 
     let contributors = []
     if (token) {
-      contributors = await githubFetchContributorsForPage(owner, name, branch, githubPath, token)
+      contributors = await githubFetchContributorsForPage(
+        api,
+        owner,
+        name,
+        branch,
+        githubPath,
+        token
+      )
     }
 
     actions.createNode({
