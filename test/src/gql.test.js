@@ -24,7 +24,7 @@ beforeEach(() => {
 test('exists', () => {
   expect(typeof githubFetch).toEqual('function')
   expect(typeof githubFetchContributorsForPage).toEqual('function')
-  expect(mockGqlFetch).toHaveBeenCalledTimes(1)
+  expect(mockGqlFetch).not.toHaveBeenCalled()
 })
 
 test('githubFetch', async () => {
@@ -33,7 +33,7 @@ test('githubFetch', async () => {
   const token = 'my-token'
   mockFetch.mockResolvedValueOnce(result)
 
-  await expect(githubFetch(query, token)).resolves.toEqual(result)
+  await expect(githubFetch('https://api.github.com/graphql', query, token)).resolves.toEqual(result)
   expect(mockFetch).toHaveBeenCalledWith(query, {},
     {
       headers: {

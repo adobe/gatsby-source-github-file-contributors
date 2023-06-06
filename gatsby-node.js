@@ -32,15 +32,12 @@ exports.createSchemaCustomization = ({ actions }) => {
 
 exports.sourceNodes = async ({ actions, createNodeId, createContentDigest }, options = {}) => {
   const cwd = process.cwd()
-  const root = options.pages
+  const root = options.pages && options.pages.root
     ? options.pages.root
-      ? options.pages.root
-      : options.root
-        ? options.root
-        : ''
     : options.root
       ? options.root
       : ''
+
   const {
     paths: pages = ['src/pages'],
     extensions = ['md', 'mdx'],
