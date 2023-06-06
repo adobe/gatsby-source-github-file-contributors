@@ -37,14 +37,16 @@ plugins: [
         pages: {
           root: '', // root of the page paths (below) in the Github repo
           paths: ['src/pages'], // relative path of the pages from the config
-          extensions: ['md'] // page extensions to filter for
+          extensions: ['md'], // page extensions to filter for
+          prefix: '' // prefix to remove from path, Optional
         },
         repo: {
           token: process.env.REPO_GITHUB_TOKEN, // Github Personal Access Token
           owner: process.env.REPO_OWNER, // user or org name
           name: process.env.REPO_NAME, 
           branch: process.env.REPO_BRANCH, // defaults to 'main'
-          default_branch: process.env.REPO_DEFAULT_BRANCH // defaults to 'main'
+          default_branch: process.env.REPO_DEFAULT_BRANCH, // defaults to 'main'
+          api: 'https://api.github.com/graphql' // API url, Optional. Default: 'https://api.github.com/graphql'
         }
       }
   }
@@ -68,6 +70,7 @@ GraphQL
         date
         login
         name
+        avatarUrl
       }
       path
     }
@@ -90,4 +93,3 @@ Contributions are welcome! Read the [Contributing Guide](./.github/CONTRIBUTING.
 ### Licensing
 
 This project is licensed under the Apache V2 License. See [LICENSE](LICENSE) for more information.
-

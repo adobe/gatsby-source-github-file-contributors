@@ -91,7 +91,7 @@ describe('gatsby-node', () => {
 
     pages.forEach((page, index) => {
       const { owner, name, branch, token } = options.repo
-      expect(mockGithubFetchContributors).toHaveBeenNthCalledWith(index + 1, owner, name, branch, page, token)
+      expect(mockGithubFetchContributors).toHaveBeenNthCalledWith(index + 1, 'https://api.github.com/graphql', owner, name, branch, page, token)
       // skip the very first createNode, which is a Github object
       expect(gatsbyHelpers.actions.createNode).toHaveBeenNthCalledWith(index + 2, expect.objectContaining({
         contributors: contributors[index],
@@ -118,7 +118,34 @@ describe('gatsby-node', () => {
     pages.forEach((page, index) => {
       const { owner, name, branch, token } = _options.repo
       const pagePath = path.join(root, page)
-      expect(mockGithubFetchContributors).toHaveBeenNthCalledWith(index + 1, owner, name, branch, pagePath, token)
+      expect(mockGithubFetchContributors).toHaveBeenNthCalledWith(index + 1, 'https://api.github.com/graphql', owner, name, branch, pagePath, token)
+      // skip the very first createNode, which is a Github object
+      expect(gatsbyHelpers.actions.createNode).toHaveBeenNthCalledWith(index + 2, expect.objectContaining({
+        contributors: contributors[index],
+        internal: expect.objectContaining({
+          type: 'GithubContributors'
+        })
+      }))
+    })
+  })
+
+  test('with prefix', async () => {
+    mockGlobby.mockResolvedValue(pages)
+    mockGithubFetchContributors
+      .mockResolvedValueOnce(contributors[0])
+      .mockResolvedValueOnce(contributors[1])
+
+    const _options = Object.assign({}, options)
+    _options.pages.paths = ['/some/fake/path']
+    _options.pages.prefix = '/some/fake/path'
+    _options.pages.root = '/some/fake/path'
+    await expect(gatsbyNode.sourceNodes(gatsbyHelpers, _options)).resolves.toEqual(undefined)
+    expect(gatsbyHelpers.actions.createNode).toHaveBeenCalledTimes(pages.length + 1)
+    expect(mockGithubFetchContributors).toHaveBeenCalledTimes(pages.length)
+
+    pages.forEach((page, index) => {
+      const { owner, name, branch, token } = _options.repo
+      expect(mockGithubFetchContributors).toHaveBeenNthCalledWith(index + 1, 'https://api.github.com/graphql', owner, name, branch, page, token)
       // skip the very first createNode, which is a Github object
       expect(gatsbyHelpers.actions.createNode).toHaveBeenNthCalledWith(index + 2, expect.objectContaining({
         contributors: contributors[index],
